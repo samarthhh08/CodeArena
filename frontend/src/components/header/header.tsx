@@ -39,10 +39,10 @@ const Header = () => {
 
       <div className="hidden sm:flex sm:flex-row self-end  ">
         <a
-          href=""
-          className="mx-2 text-md font-medium text-gray-700 hover:text-blue-500 flex"
+          href="/signin"
+          className="mx-4 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-500 flex"
         >
-          Login
+          Sign In
         </a>
       </div>
     </div>
