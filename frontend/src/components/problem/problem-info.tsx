@@ -27,7 +27,7 @@ const ProblemInfo: React.FC<Props> = ({ problem }) => {
       <div className="flex flex-col gap-y-2">
         {problem.sampleTestCases.map((s, i) => (
           <div
-            className="bg-gray-200 text-gray-700 px-3 py-2 flex flex-col gap-y-2 rounded-md"
+            className="bg-gray-200 text-gray-700 px-3 py-2 flex flex-col gap-y-2 rounded-md text-sm max-w-[400px]"
             key={i}
           >
             <p>{`Input: ${s.input}`}</p>

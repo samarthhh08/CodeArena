@@ -12,6 +12,8 @@ using CjsApi.Services.CodeExecution.Factory;
 using CjsApi.Infrastructure.Docker;
 using CjsApi.Services.CodeExecution.Store;
 using CjsApi.Services.CodeExecution.Worker;
+using CjsApi.Services.ProblemService;
+using CjsApi.Repositories.ProblemRepository;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -84,6 +86,8 @@ builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
+builder.Services.AddScoped<IProblemService,ProblemService>();
+builder.Services.AddScoped<IProblemRepository,ProblemRepository>();
 
 builder.Services.AddSingleton<CodeExecutorBase, JavaCodeExecutor>();
 builder.Services.AddSingleton<CodeExecutorBase, NodeCodeExecutor>();

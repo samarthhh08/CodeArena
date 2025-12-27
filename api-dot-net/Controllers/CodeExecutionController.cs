@@ -1,4 +1,5 @@
 
+using System.Threading.Tasks;
 using CjsApi.Dto.RequestDto;
 using CjsApi.Dto.ResponseDto;
 using CjsApi.Services;
@@ -21,10 +22,24 @@ namespace CjsApi.Controllers
         }
 
         [HttpPost("run")]
-        public ActionResult<ApiResponseDto<string>> RunCode(
+        public async Task<ActionResult<ApiResponseDto<string>>> RunCode(
         [FromBody] CodeRunRequestDto dto)
         {
-            var jobId = _service.Submit(dto);
+            var jobId = await _service.RunAsync(dto);
+
+            return Ok(new ApiResponseDto<string>(
+                true,
+                "Execution started",
+                jobId
+            ));
+        }
+
+
+        [HttpPost("submit")]
+        public async Task<ActionResult<ApiResponseDto<string>>> SubmitCode(
+        [FromBody] CodeRunRequestDto dto)
+        {
+            var jobId = await _service.SubmitAsync(dto);
 
             return Ok(new ApiResponseDto<string>(
                 true,

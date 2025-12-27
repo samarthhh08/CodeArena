@@ -13,7 +13,8 @@ import axios, { AxiosError } from "axios";
 import { Link } from "react-router-dom";
 import { MaximizeIcon, MinimizeIcon } from "lucide-react";
 import { Spinner } from "../ui/spinner";
-
+import { FaCircleCheck, FaCircleUp, FaPlay } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
 type Language = "node" | "java" | "cpp";
 
 type ExecutionResult = {
@@ -27,14 +28,15 @@ type ExecutionResult = {
 
 type Props = {
   isAuthenticated: boolean;
+  problemId: number;
 };
 
-const CodeEditor: React.FC<Props> = ({ isAuthenticated }) => {
+const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
   const [language, setLanguage] = useState<Language>("node");
   const [code, setCode] = useState(BOILERPLATE.node);
   const [actionDisable, setActionDisable] = useState(false);
   const [showRunSpinner, setShowRunSpinner] = useState(false);
-  // const [showSubmitSpinner, setShowSubmitSpinner] = useState(false);
+  const [showSubmitSpinner, setShowSubmitSpinner] = useState(false);
   const [executionResult, setExecutionResult] =
     useState<ExecutionResult | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -56,8 +58,8 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated }) => {
       setShowResult(false);
 
       const res = await axios.post(
-        "http://localhost:5046/api/code/run",
-        { language, sourceCode: code },
+        `http://localhost:5046/api/code/run`,
+        { language, sourceCode: code, problemId: problemId },
         { withCredentials: true }
       );
 
@@ -94,8 +96,49 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated }) => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Submit code:", { language, code });
+  const handleSubmit = async () => {
+    try {
+      setActionDisable(true);
+      setShowSubmitSpinner(true);
+      setShowResult(false);
+
+      const res = await axios.post(
+        `http://localhost:5046/api/code/submit`,
+        { language, sourceCode: code, problemId: problemId },
+        { withCredentials: true }
+      );
+
+      const jobId = res.data.data;
+
+      pollingRef.current = setInterval(async () => {
+        try {
+          const res = await axios.get(
+            `http://localhost:5046/api/code/status/${jobId}`,
+            { withCredentials: true }
+          );
+
+          const status = res.data.data.status;
+
+          if (status === "Completed" || status === "Failed") {
+            clearInterval(pollingRef.current!);
+            setExecutionResult(res.data.data);
+            console.log(res.data.data);
+            setShowResult(true);
+
+            setIsMaximized(true);
+            setActionDisable(false);
+            setShowSubmitSpinner(false);
+          }
+        } catch {
+          clearInterval(pollingRef.current!);
+        }
+      }, 1500);
+    } catch (error) {
+      setActionDisable(false);
+      if (error instanceof AxiosError) {
+        console.error(error.response?.data.message);
+      }
+    }
   };
 
   return (
@@ -147,16 +190,23 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated }) => {
             variant="outline"
             onClick={handleRun}
             disabled={actionDisable}
-            className="bg-blue-600 text-white w-20 text-xs h-7"
+            className=" bg-gray-200 text-xs w-24 h-7 px-4"
           >
             {showRunSpinner && <Spinner />}
             Run
+            {!showRunSpinner && <FaPlay className="!w-[12px] !h-[12px]" />}
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-green-600 text-white w-20 text-xs h-7"
+            variant={"outline"}
+            className=" bg-gray-200 w-24 text-xs h-7 px-4"
+            disabled={actionDisable}
           >
+            {showSubmitSpinner && <Spinner />}
             Submit
+            {!showSubmitSpinner && (
+              <FaCircleUp className="!w-[12px] !h-[12px]" />
+            )}
           </Button>
         </div>
       )}
@@ -218,14 +268,17 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated }) => {
             showResult && (
               <div className="flex flex-wrap gap-2">
                 {executionResult.result.testCaseResults.map((tc) => (
-                  <span
+                  <div
                     key={tc.index}
-                    className={`px-2 py-2 rounded text-white ${
-                      tc.passed ? "bg-green-600" : "bg-red-500"
-                    }`}
+                    className={` flex flex-row gap-x-2 justify-center items-center px-2 py-2 rounded bg-gray-200`}
                   >
+                    {tc.passed ? (
+                      <FaCircleCheck className="text-green-600 !w-[16px] !h-[16px] " />
+                    ) : (
+                      <MdCancel className="text-red-600 !w-[16px] !h-[16px]" />
+                    )}{" "}
                     Test Case {`${tc.index}`}
-                  </span>
+                  </div>
                 ))}
               </div>
             )}

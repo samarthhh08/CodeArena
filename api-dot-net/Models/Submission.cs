@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace CjsApi.Models
 {
 
@@ -15,6 +18,7 @@ namespace CjsApi.Models
 
     public class Submission
     {
+        [Key]
         public int Id { get; set; }
 
         public int UserId { get; set; }
@@ -23,9 +27,13 @@ namespace CjsApi.Models
         public int ProblemId { get; set; }
         public Problem Problem { get; set; } = null!;
 
+        [Required]
         public string Language { get; set; } = null!; // cpp, java, python
+
+        [Required]
         public string Code { get; set; } = null!;
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public SubmissionStatus Status { get; set; }
 
         public int ExecutionTimeMs { get; set; }
