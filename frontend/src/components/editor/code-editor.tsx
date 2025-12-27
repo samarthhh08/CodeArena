@@ -41,6 +41,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
     useState<ExecutionResult | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [showProcessing,setShowProcessing] = useState(false);
 
   const pollingRef = useRef<number | null>(null);
   console.log(executionResult);
@@ -56,6 +57,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
       setActionDisable(true);
       setShowRunSpinner(true);
       setShowResult(false);
+      setShowProcessing(true);
 
       const res = await axios.post(
         `http://localhost:5046/api/code/run`,
@@ -83,6 +85,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
             setIsMaximized(true);
             setActionDisable(false);
             setShowRunSpinner(false);
+            setShowProcessing(false);
           }
         } catch {
           clearInterval(pollingRef.current!);
@@ -98,6 +101,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
 
   const handleSubmit = async () => {
     try {
+      setShowProcessing(true);
       setActionDisable(true);
       setShowSubmitSpinner(true);
       setShowResult(false);
@@ -128,6 +132,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
             setIsMaximized(true);
             setActionDisable(false);
             setShowSubmitSpinner(false);
+            setShowProcessing(false);
           }
         } catch {
           clearInterval(pollingRef.current!);
@@ -208,6 +213,7 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
               <FaCircleUp className="!w-[12px] !h-[12px]" />
             )}
           </Button>
+          {showProcessing && <p className="text-yellow-600 text-xs">Execution is in process...</p>}
         </div>
       )}
 

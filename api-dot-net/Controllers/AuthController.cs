@@ -11,7 +11,7 @@ namespace CjsApi.Controllers
 {
 
 
-  
+
     [ApiController]
     [Route("api/auth")]
     public class AuthController(AuthService authService, JwtTokenService jwtTokenService) : ControllerBase
@@ -19,14 +19,14 @@ namespace CjsApi.Controllers
         readonly AuthService _authService = authService;
         readonly JwtTokenService _jwtTokenService = jwtTokenService;
 
-  [AllowAnonymous]
+        [AllowAnonymous]
         [HttpPost("signin")]
-        public ActionResult<ApiResponseDto<string>> SignIn([FromBody] SignInRequestDto signInRequestDto)
+        public async Task<ActionResult<ApiResponseDto<string>>> SignIn([FromBody] SignInRequestDto signInRequestDto)
         {
 
             try
             {
-                AuthUserDto user = _authService.SignIn(signInRequestDto);
+                AuthUserDto user = await _authService.SignInAsync(signInRequestDto);
 
                 var token = _jwtTokenService.GenerateToken(user.UserId, user.Email);
 
@@ -65,11 +65,11 @@ namespace CjsApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("signup")]
-        public ActionResult<ApiResponseDto<string>> SignUp([FromBody] SignUpRequestDto signUpRequestDto)
+        public async Task<ActionResult<ApiResponseDto<string>>> SignUp([FromBody] SignUpRequestDto signUpRequestDto)
         {
             try
             {
-                AuthUserDto user = _authService.SignUp(signUpRequestDto);
+                AuthUserDto user = await _authService.SignUpAsync(signUpRequestDto);
 
 
                 var token = _jwtTokenService.GenerateToken(user.UserId, user.Email);
@@ -126,20 +126,31 @@ namespace CjsApi.Controllers
 
         [Authorize]
         [HttpPost("me")]
-        public ActionResult<ApiResponseDto<AuthUserDto>> Me()
+        public async Task<ActionResult<ApiResponseDto<AuthUserDto>>> Me()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
-                return Unauthorized();
+                if (userId == null)
+                    return Unauthorized();
 
-            var user = _authService.GetUserInfo(int.Parse(userId));
+                var user = await _authService.GetUserInfoAsync(int.Parse(userId));
 
-            return Ok(new ApiResponseDto<AuthUserDto>(
-                true,
-                "User information retrieved successfully",
-                user
-            ));
+                return Ok(new ApiResponseDto<AuthUserDto>(
+                    true,
+                    "User information retrieved successfully",
+                    user
+                ));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponseDto<string>(
+                    false,
+                    e.Message,
+                    null
+                ));
+            }
 
         }
     }

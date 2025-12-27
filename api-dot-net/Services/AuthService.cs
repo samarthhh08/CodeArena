@@ -1,59 +1,90 @@
-
 using CjsApi.Dto.RequestDto;
 using CjsApi.Dto.ResponseDto;
+using CjsApi.Models;
+using Microsoft.AspNetCore.Identity;
 
-namespace CjsApi.Services
+namespace CjsApi.Services;
+
+public sealed class AuthService
 {
-    public class AuthService
+    private readonly UserService _userService;
+    private readonly PasswordHasher<User> _passwordHasher = new();
+
+    public AuthService(UserService userService)
     {
+        _userService = userService;
+    }
 
-        UserService _userService;
+    public async Task<AuthUserDto> SignInAsync(
+        SignInRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userService.FindUserByEmailAsync(
+            request.Email,
+            cancellationToken)
+            ?? throw new Exception("Invalid email or password.");
 
+        var verificationResult = _passwordHasher.VerifyHashedPassword(
+            user,
+            user.PasswordHash,
+            request.Password
+        );
 
-        public AuthService(UserService userService)
+        if (verificationResult == PasswordVerificationResult.Failed)
         {
-            _userService = userService;
-
-        }
-        public AuthUserDto SignIn(SignInRequestDto signInRequestDto)
-        {
-
-            var user = _userService.FindUserByEmail(signInRequestDto.Email) ?? throw new Exception("Invalid email or password.");
-
-
-
-            if (user.PasswordHash.Equals(signInRequestDto.Password) == false)
-            {
-
-                throw new Exception("Invalid email or password.");
-            }
-
-            return new AuthUserDto(user.Id.ToString(), user.Email, user.Username, user.Role);
+            throw new Exception("Invalid email or password.");
         }
 
-        public AuthUserDto SignUp(SignUpRequestDto signUpRequestDto)
+        // 🔐 Auto-rehash if needed
+        if (verificationResult == PasswordVerificationResult.SuccessRehashNeeded)
         {
-            var existingUser = _userService.FindUserByEmail(signUpRequestDto.Email);
-            if (existingUser != null)
-            {
-                throw new Exception("Email already in use.");
-            }
-
-            var newUser = _userService.CreateUser(signUpRequestDto);
-
-
-            return new AuthUserDto(newUser.Id.ToString(), newUser.Email, newUser.Username, newUser.Role);
+            user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+            // save updated hash if you expose update method
         }
 
+        return new AuthUserDto(
+            user.Id.ToString(),
+            user.Email,
+            user.Username,
+            user.Role
+        );
+    }
 
+    public async Task<AuthUserDto> SignUpAsync(
+        SignUpRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var existingUser = await _userService.FindUserByEmailAsync(
+            request.Email,
+            cancellationToken);
 
-        public AuthUserDto GetUserInfo(int id)
-        {
+        if (existingUser != null)
+            throw new Exception("Email already in use.");
 
-            var user = _userService.FindUserById(id) ?? throw new Exception("Invalid userid.");
-            
-            return new AuthUserDto(user.Id.ToString(), user.Email, user.Username, user.Role);
+        var newUser = await _userService.CreateUserAsync(
+            request,
+            cancellationToken);
 
-        }
+        return new AuthUserDto(
+            newUser.Id.ToString(),
+            newUser.Email,
+            newUser.Username,
+            newUser.Role
+        );
+    }
+
+    public async Task<AuthUserDto> GetUserInfoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userService.FindUserByIdAsync(id, cancellationToken)
+            ?? throw new Exception("Invalid user id.");
+
+        return new AuthUserDto(
+            user.Id.ToString(),
+            user.Email,
+            user.Username,
+            user.Role
+        );
     }
 }

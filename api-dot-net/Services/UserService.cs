@@ -1,66 +1,56 @@
-
 using CjsApi.Dto.RequestDto;
 using CjsApi.Models;
-using CjsApi.Repositories;
+using CjsApi.Repositories.UserRepository;
+using Microsoft.AspNetCore.Identity;
 
-namespace CjsApi.Services
+namespace CjsApi.Services;
+
+public sealed class UserService
 {
-    public class UserService(IUserRepository userRepository)
+    private readonly IUserRepository _userRepository;
+    private readonly PasswordHasher<User> _passwordHasher = new();
+
+    public UserService(IUserRepository userRepository)
     {
-        IUserRepository _userRepository = userRepository;
+        _userRepository = userRepository;
+    }
 
-
-        public User CreateUser(SignUpRequestDto signUpRequest)
+    public async Task<User> CreateUserAsync(
+        SignUpRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        // 1️⃣ Check if user already exists
+        if (await _userRepository.ExistsByEmailAsync(request.Email, cancellationToken))
         {
-            var user = new Models.User
-            {
-                Username = signUpRequest.Username,
-                Email = signUpRequest.Email,
-                PasswordHash = signUpRequest.Password,
-                Role = Role.USER
-            };
-
-            return _userRepository.AddUser(user);
-
+            throw new InvalidOperationException("User already exists");
         }
 
-
-        public User? FindUserByEmail(string email)
+        // 2️⃣ Create user entity
+        var user = new User
         {
-            var user = _userRepository.GetUserByEmail(email);
-            if (user == null)
-            {
-                return null;
-            }
+            Username = request.Username,
+            Email = request.Email,
+            Role = Role.USER
+        };
 
-            return new Models.User
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PasswordHash = user.PasswordHash,
-                Role = user.Role
-            };
-        }
+        // 3️⃣ Hash password (CRITICAL)
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-        public User? FindUserById(int id)
-        {
-            
-             var user = _userRepository.GetUserById(id);
-            if (user == null)
-            {
-                return null;
-            }
+        // 4️⃣ Save user
+        return await _userRepository.AddAsync(user, cancellationToken);
+    }
 
-            return new Models.User
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PasswordHash = user.PasswordHash,
-                Role = user.Role
-            };
-        }
+    public async Task<User?> FindUserByEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.GetByEmailAsync(email, cancellationToken);
+    }
 
+    public async Task<User?> FindUserByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.GetByIdAsync(id, cancellationToken);
     }
 }

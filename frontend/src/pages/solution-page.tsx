@@ -7,6 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 // import { useParams } from "react-router-dom";
 
 import type { Problem } from "@/types/problem";
+import Loading from "@/components/loading";
+import NotFound from "@/components/not-found";
 const SolutionPage = () => {
   // const { id } = useParams();
   const { isAuthenticated, isLoading } = useAuth();
@@ -34,7 +36,10 @@ const SolutionPage = () => {
     fetchProblem();
   }, [fetchProblem]);
 
-  if (isLoading || isProblemLoading) return null;
+  if (isLoading || isProblemLoading) return <Loading />;
+
+  if (!isLoading && !isProblemLoading && !problem) return <NotFound />;
+
   return (
     <div className="flex flex-col sm:flex-row w-full px-2 py-2 gap-x-2 gap-y-2 ">
       <div className="w-full sm:w-2/4 sm:h-[520px] lg:h-[620px] xl:[740px]">

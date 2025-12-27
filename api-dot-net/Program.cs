@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text;
-using CjsApi.Repositories;
+using CjsApi.Repositories.UserRepository;
 using CjsApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -85,7 +85,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProblemService,ProblemService>();
 builder.Services.AddScoped<IProblemRepository,ProblemRepository>();
 

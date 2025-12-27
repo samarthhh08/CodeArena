@@ -27,11 +27,11 @@ const ProblemInfo: React.FC<Props> = ({ problem }) => {
       <div className="flex flex-col gap-y-2">
         {problem.sampleTestCases.map((s, i) => (
           <div
-            className="bg-gray-200 text-gray-700 px-3 py-2 flex flex-col gap-y-2 rounded-md text-sm max-w-[400px]"
+            className="bg-gray-200 text-gray-700 px-3 py-2 flex flex-col gap-y-2 rounded-sm text-sm font-semibold  max-w-[400px]"
             key={i}
           >
-            <p>{`Input: ${s.input}`}</p>
-            <p>{`Output: ${s.output}`}</p>
+            <p>{`Input:- ${s.input}`}</p>
+            <p>{`Output:- ${s.output}`}</p>
             {s.explanation && <p>{`Explanation: ${s.explanation}`}</p>}
           </div>
         ))}
