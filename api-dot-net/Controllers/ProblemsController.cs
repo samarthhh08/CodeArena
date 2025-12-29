@@ -7,6 +7,7 @@ using CjsApi.Services;
 using CjsApi.Services.CodeExecution.Dto;
 using CjsApi.Services.ProblemService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CjsApi.Controllers
 {
@@ -24,12 +25,28 @@ namespace CjsApi.Controllers
 
         }
         [HttpGet]
-        public async Task<ActionResult<ApiResponseDto<GetAllProblemDto>>> GetAllProblems()
+        public async Task<ActionResult<ApiResponseDto<GetAllProblemDto>>> GetAllProblems(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10
+            )
         {
-            var problems = await _problemService.GetProblemsAsync(
+            if (page <= 0) page = 1;
+            if (pageSize <= 0 || pageSize > 50) pageSize = 10;
+
+            // 1️⃣ Fetch all (or IQueryable ideally)
+            var problemsQuery = _problemService.GetProblemsQueryable(
                 difficulty: null,
                 tags: null
             );
+
+            // 2️⃣ Total count (before pagination)
+            var total = await problemsQuery.CountAsync();
+
+            // 3️⃣ Apply pagination
+            var problems = await problemsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var responseDto = new GetAllProblemDto
             {
@@ -38,11 +55,12 @@ namespace CjsApi.Controllers
                     Title = p.Title,
                     Difficulty = p.Difficulty,
                     Slug = p.Slug
+                }).ToList(),
 
-                }).ToList()
+                Total = total,
+                Page = page,
+                PageSize = pageSize
             };
-
-            Console.WriteLine(responseDto);
 
             return Ok(new ApiResponseDto<GetAllProblemDto>(
                 true,
@@ -50,6 +68,7 @@ namespace CjsApi.Controllers
                 responseDto
             ));
         }
+
 
         [HttpGet("{slug}")]
         public async Task<ActionResult<ApiResponseDto<GetProblemDto>>> GetProblem(string slug)

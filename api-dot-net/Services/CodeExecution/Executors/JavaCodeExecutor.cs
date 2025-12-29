@@ -111,7 +111,11 @@ namespace CjsApi.Services.CodeExecution.Executors
                 );
 
                 if (compile.ExitCode != 0)
-                    return Fail(compile);
+                {
+                    CodeExecutionResult result = Fail(compile);
+                    result.SubmissionStatus = Models.SubmissionStatus.COMPILATION_ERROR;
+                    return result;
+                }
 
                 /* -------------------------------------------------
                  * STEP 3: Run for EACH test case
@@ -155,7 +159,8 @@ namespace CjsApi.Services.CodeExecution.Executors
                 {
                     ExitCode = 0,
                     Output = $"{testResults.Count(t => t.Passed)} / {testResults.Count} test cases passed",
-                    TestCaseResults = testResults
+                    TestCaseResults = testResults,
+                    SubmissionStatus = Models.SubmissionStatus.ACCEPTED
                 };
             }
             finally

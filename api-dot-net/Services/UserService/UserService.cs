@@ -1,18 +1,24 @@
+
+using System.Security.Cryptography.X509Certificates;
+using CjsApi.Dto;
 using CjsApi.Dto.RequestDto;
 using CjsApi.Models;
+using CjsApi.Repositories.SubmissionRepository;
 using CjsApi.Repositories.UserRepository;
 using Microsoft.AspNetCore.Identity;
 
-namespace CjsApi.Services;
+namespace CjsApi.Services.UserService;
 
 public sealed class UserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ISubmissionRepository _submissionRepository;
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, ISubmissionRepository submissionRepository)
     {
         _userRepository = userRepository;
+        _submissionRepository = submissionRepository;
     }
 
     public async Task<User> CreateUserAsync(
@@ -53,4 +59,37 @@ public sealed class UserService
     {
         return await _userRepository.GetByIdAsync(id, cancellationToken);
     }
+
+
+    public async Task<UserProfileDto> GetUserProfile(int userId)
+    {
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("Invalid user id");
+        }
+
+        var userSubmissions = await _submissionRepository.GetByUserAsync(userId);
+
+        var profile = new UserProfileDto
+        {
+            Username = user.Username,
+            Email = user.Email,
+            About = "",
+            LatestSubmissions = userSubmissions
+                .Select(s => new ProblemSubmissionDetails
+                {
+                    Title = s.Problem.Title,      // assuming navigation property
+                    Status = s.Status
+                })
+                .ToList()
+        };
+
+        return profile;
+    }
+
+   
+
+
 }

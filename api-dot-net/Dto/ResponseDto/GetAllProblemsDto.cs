@@ -7,7 +7,7 @@ namespace CjsApi.Dto
     {
         public string Title { get; set; } = string.Empty;
 
-        public string Slug {get;set;} = string.Empty;
+        public string Slug { get; set; } = string.Empty;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public Difficulty Difficulty { get; set; } = Difficulty.EASY;
@@ -17,5 +17,9 @@ namespace CjsApi.Dto
     {
         public List<ProblemMetaDataDto> Problems { get; set; }
             = new List<ProblemMetaDataDto>();
+
+        public int Total { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
     }
 }

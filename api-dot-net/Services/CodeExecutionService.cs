@@ -18,6 +18,7 @@ namespace CjsApi.Services
 
         private readonly IProblemService _problemService;
 
+
         public CodeExecutionService(
             ExecutionJobStore jobStore,
             CodeExecutionWorker worker, IProblemService problemService)
@@ -65,9 +66,9 @@ namespace CjsApi.Services
 
 
 
-         public async Task<string> SubmitAsync(CodeRunRequestDto dto)
+        public async Task<string> SubmitAsync(CodeRunRequestDto dto ,int submissionId)
         {
-            var job = _jobStore.CreateJob();
+            var job = _jobStore.CreateJob(submissionId);
 
             Console.WriteLine($"📥 Submit called. JobId = {job.JobId}");
 
@@ -84,6 +85,8 @@ namespace CjsApi.Services
                                 tc.ExpectedOutput
                             ))
                             .ToList();
+
+
 
             // 3️⃣ Build execution request
             var request = new CodeExecutionRequest

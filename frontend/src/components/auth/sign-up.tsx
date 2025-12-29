@@ -56,7 +56,7 @@ const SignUp = () => {
         </h2>
 
         {error && (
-          <p className="w-full px-2 py-2 text-xs bg-red-400 text-red-500 rounded-2 text-center">
+          <p className="w-full px-2 py-2 text-xs bg-red-100 text-red-500 rounded-2 text-center my-2">
             {error}
           </p>
         )}

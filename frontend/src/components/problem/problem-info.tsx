@@ -1,5 +1,7 @@
 import type { Problem } from "@/types/problem";
 import { Card } from "../ui/card";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Props = {
   problem: Problem;
@@ -7,34 +9,43 @@ type Props = {
 
 const ProblemInfo: React.FC<Props> = ({ problem }) => {
   return (
-    <Card className="w-full min-h-full max-h-ufll flex flex-col gap-y-4 px-4 sm:px-8 py-4">
-      <p className="font-bold text-xl sm:text-3xl">{problem.title}</p>
+    <Card className="h-full flex flex-col px-4 sm:px-8 py-4">
+      {/* Header */}
+      <p className="font-bold text-xl sm:text-3xl mb-2">{problem.title}</p>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         {problem.tags.map((t, i) => (
-          <div
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-xs"
+          <span
             key={i}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-xs"
           >
             {t}
-          </div>
+          </span>
         ))}
       </div>
 
-      <p className="text-gray-600">{problem.description}</p>
+      {/* Scrollable body */}
+      <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+        <div className="prose prose-sm sm:prose-base max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {problem.description}
+          </ReactMarkdown>
+        </div>
 
-      <p className="font-bold text-lg"> Sample Test Cases</p>
-      <div className="flex flex-col gap-y-2">
-        {problem.sampleTestCases.map((s, i) => (
-          <div
-            className="bg-gray-200 text-gray-700 px-3 py-2 flex flex-col gap-y-2 rounded-sm text-sm font-semibold  max-w-[400px]"
-            key={i}
-          >
-            <p>{`Input:- ${s.input}`}</p>
-            <p>{`Output:- ${s.output}`}</p>
-            {s.explanation && <p>{`Explanation: ${s.explanation}`}</p>}
-          </div>
-        ))}
+        <p className="font-bold text-lg mt-6">Sample Test Cases</p>
+
+        <div className="flex flex-col gap-y-2 mt-2">
+          {problem.sampleTestCases.map((s, i) => (
+            <div
+              key={i}
+              className="bg-gray-200 px-3 py-2 rounded text-sm font-semibold"
+            >
+              <p>Input: {s.input}</p>
+              <p>Output: {s.output}</p>
+              {s.explanation && <p>Explanation: {s.explanation}</p>}
+            </div>
+          ))}
+        </div>
       </div>
     </Card>
   );

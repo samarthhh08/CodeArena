@@ -6,6 +6,7 @@ import SignUpPage from "./pages/singup";
 import HomePage from "./pages/home";
 import { AuthProvider } from "./auth/AuthProvider";
 import SolutionPage from "./pages/solution-page";
+import ProblemListPage from "./pages/problem-list-page";
 
 function App() {
   return (
@@ -18,8 +19,9 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/signin" element={<SignInPage />} />
               <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/problems" element={<ProblemListPage />}></Route>
               <Route
-                path={`/problems/:id/solution`}
+                path={`/problems/:slug/solution`}
                 element={<SolutionPage />}
               />
             </Routes>

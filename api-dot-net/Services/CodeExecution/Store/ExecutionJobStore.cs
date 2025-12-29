@@ -9,9 +9,15 @@ namespace CjsApi.Services.CodeExecution.Store
     {
         private readonly ConcurrentDictionary<string, ExecutionJob> _jobs = new();
 
-        public ExecutionJob CreateJob()
+        public ExecutionJob CreateJob(int submissionId = -1)
         {
+
             var job = new ExecutionJob();
+
+            if (submissionId != -1)
+            {
+                job.SubmissionId = submissionId;
+            }
             _jobs[job.JobId] = job;
             return job;
         }

@@ -42,10 +42,5 @@ namespace CjsApi.Models
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
     }
 
-    // public class ExecutionResult
-    // {
-    //     public int SubmissionId { get; set; }
-    //     public string Logs { get; set; } = null!;
-    // }
-
+   
 }

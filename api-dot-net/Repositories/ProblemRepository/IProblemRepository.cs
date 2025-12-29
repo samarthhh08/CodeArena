@@ -4,6 +4,13 @@ namespace CjsApi.Repositories.ProblemRepository
 {
     public interface IProblemRepository
     {
+
+        IQueryable<Problem> Query(
+       bool onlyPublished,
+       Difficulty? difficulty,
+       List<string>? tags
+   );
+
         Task<IEnumerable<Problem>> GetAllAsync(
             bool onlyPublished = true,
             Difficulty? difficulty = null,

@@ -114,7 +114,13 @@ public sealed class CppCodeExecutor : CodeExecutorBase
             );
 
             if (compile.ExitCode != 0)
-                return Fail(compile);
+            {
+                CodeExecutionResult result = Fail(compile);
+                result.SubmissionStatus = Models.SubmissionStatus.COMPILATION_ERROR;
+                return result;
+            }
+
+
 
             /* -------------------------------------------------
              * STEP 3: Run for EACH test case
@@ -156,14 +162,15 @@ public sealed class CppCodeExecutor : CodeExecutorBase
                 // Optional: stop on first failure (like Codeforces)
                 // if (output != expected) break;
             }
-        
+
 
             return new CodeExecutionResult
             {
                 //ExitCode = testResults.All(t => t.Passed) ? 0 : 1,
                 ExitCode = 0,
                 Output = $"{testResults.Count(t => t.Passed)} / {testResults.Count} test cases passed",
-                TestCaseResults = testResults
+                TestCaseResults = testResults,
+                SubmissionStatus = Models.SubmissionStatus.ACCEPTED
             };
         }
         finally
@@ -216,7 +223,7 @@ public sealed class CppCodeExecutor : CodeExecutorBase
         var inspect = await docker.Exec.InspectContainerExecAsync(exec.ID, ct);
 
         return (
-            (int)inspect.ExitCode ,
+            (int)inspect.ExitCode,
             Encoding.UTF8.GetString(stdout.ToArray()) +
             Encoding.UTF8.GetString(stderr.ToArray())
         );

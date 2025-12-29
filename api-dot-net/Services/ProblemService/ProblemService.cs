@@ -24,6 +24,22 @@ namespace CjsApi.Services.ProblemService
             );
         }
 
+
+
+        // For pagination
+        public IQueryable<Problem> GetProblemsQueryable(
+            Difficulty? difficulty,
+            List<string>? tags
+        )
+        {
+            return _problemRepository.Query(
+                onlyPublished: true,
+                difficulty: difficulty,
+                tags: tags
+            );
+        }
+
+
         public async Task<Problem> GetProblemBySlugAsync(string slug)
         {
             var problem = await _problemRepository.GetBySlugAsync(slug);

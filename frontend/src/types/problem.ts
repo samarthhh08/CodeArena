@@ -1,8 +1,9 @@
 export type Problem = {
-  id:number,
+  id: number;
   title: string;
+  slug: string;
   description: string;
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: "EASY" | "MEDIUM" | "HARD";
   tags: string[];
   sampleTestCases: {
     input: string;
@@ -11,4 +12,10 @@ export type Problem = {
   }[];
   constraints?: string[];
   hints?: string[];
+};
+
+export type ProblemSubmission = {
+  title: string;
+  status: string;
+  language:string;
 };

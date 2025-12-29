@@ -12,10 +12,12 @@ namespace CjsApi.Services.CodeExecution.Worker
             Channel.CreateUnbounded<(ExecutionJob, CodeExecutionRequest)>();
 
         private readonly ICodeExecutorFactory _executorFactory;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public CodeExecutionWorker(ICodeExecutorFactory executorFactory)
+        public CodeExecutionWorker(ICodeExecutorFactory executorFactory, IServiceScopeFactory scopeFactory)
         {
             _executorFactory = executorFactory;
+            _scopeFactory = scopeFactory;
         }
 
         public void Enqueue(ExecutionJob job, CodeExecutionRequest request)
@@ -25,6 +27,11 @@ namespace CjsApi.Services.CodeExecution.Worker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
+            using var scope = _scopeFactory.CreateScope();
+
+            var submissionService =
+                scope.ServiceProvider.GetRequiredService<SubmissionService>();
             await foreach (var (job, request) in _queue.Reader.ReadAllAsync(stoppingToken))
             {
                 try
@@ -33,6 +40,12 @@ namespace CjsApi.Services.CodeExecution.Worker
 
                     var executor = _executorFactory.GetExecutor(request.Language);
                     job.Result = await executor.ExecuteAsync(request, stoppingToken);
+
+                    if (job.SubmissionId != -1)
+                    {
+
+                        await submissionService.UpdateResultAsync(job.SubmissionId, job.Result.SubmissionStatus, 0, 0);
+                    }
 
                     job.Status = ExecutionStatus.Completed;
                 }

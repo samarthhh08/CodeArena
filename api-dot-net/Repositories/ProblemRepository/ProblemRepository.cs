@@ -14,6 +14,31 @@ namespace CjsApi.Repositories.ProblemRepository
         }
 
 
+        public IQueryable<Problem> Query(
+    bool onlyPublished,
+    Difficulty? difficulty,
+    List<string>? tags
+)
+        {
+            var query = _context.Problems
+                .Include(p => p.ProblemTags)
+                .AsQueryable();
+
+            if (onlyPublished)
+                query = query.Where(p => p.IsPublished);
+
+            if (difficulty != null)
+                query = query.Where(p => p.Difficulty == difficulty);
+
+            if (tags != null && tags.Any())
+                query = query.Where(p =>
+    p.ProblemTags.Any(pt => tags.Contains(pt.Tag.Name))
+);
+
+            return query;
+        }
+
+
         public async Task<IEnumerable<Problem>> GetAllAsync(
             bool onlyPublished = true,
             Difficulty? difficulty = null,

@@ -16,6 +16,8 @@ namespace CjsApi.Services.CodeExecution.Dto
     {
         public string JobId { get; init; } = Guid.NewGuid().ToString();
 
+        public int SubmissionId {get;set;}  = -1;
+
          [JsonConverter(typeof(JsonStringEnumConverter))]
         public ExecutionStatus Status { get; set; } = ExecutionStatus.Pending;
 

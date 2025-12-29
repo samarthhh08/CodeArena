@@ -2,8 +2,9 @@ using CjsApi.Dto.RequestDto;
 using CjsApi.Dto.ResponseDto;
 using CjsApi.Models;
 using Microsoft.AspNetCore.Identity;
+using CjsApi.Services.UserService;
 
-namespace CjsApi.Services;
+
 
 public sealed class AuthService
 {
