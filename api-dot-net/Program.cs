@@ -17,6 +17,7 @@ using CjsApi.Repositories.ProblemRepository;
 using CjsApi.Services.UserService;
 using CjsApi.Repositories.SubmissionRepository;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -114,8 +115,21 @@ builder.Services.AddSingleton<ExecutionJobStore>();
 builder.Services.AddSingleton<CodeExecutionWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<CodeExecutionWorker>());
 
+builder.Services.AddHttpClient<GeminiService>();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("ai", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 5;
+    });
+});
 
 var app = builder.Build();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -127,7 +141,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowReactApp");
 app.MapControllers();
 app.UseHttpsRedirection();
-
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
