@@ -29,12 +29,15 @@ namespace CjsApi.Controllers
 
             try
             {
+               
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+               
 
                 if (!int.TryParse(userIdClaim, out int userId))
                     return Unauthorized("Invalid user id in token");
 
                 UserProfileDto profile = await _userService.GetUserProfile(userId);
+                Console.WriteLine(profile.Email);
 
                 return Ok(new ApiResponseDto<UserProfileDto>(
                     true,

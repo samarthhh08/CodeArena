@@ -69,9 +69,13 @@ public sealed class UserService
         {
             throw new Exception("Invalid user id");
         }
+        
 
         var userSubmissions = await _submissionRepository.GetByUserAsync(userId);
+        Console.WriteLine(userSubmissions);
 
+
+        // getting error at this
         var profile = new UserProfileDto
         {
             Username = user.Username,
@@ -81,10 +85,12 @@ public sealed class UserService
                 .Select(s => new ProblemSubmissionDetails
                 {
                     Title = s.Problem.Title,      // assuming navigation property
-                    Status = s.Status
+                    Status = s.Status,
+                    Language = s.Language
                 })
                 .ToList()
         };
+        Console.WriteLine(profile.Email);
 
         return profile;
     }

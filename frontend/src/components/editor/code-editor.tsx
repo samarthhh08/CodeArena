@@ -266,12 +266,13 @@ const CodeEditor: React.FC<Props> = ({ isAuthenticated, problemId }) => {
           )}
         </div>
       ) : (
-        <p className="text-xs">
+        <div className="text-xs px-2 py-2 bg-gray-200 flex gap-x-1">
+          You need to 
           <Link to="/signin" className="text-blue-600">
             Login
           </Link>{" "}
           to run or submit
-        </p>
+        </div>
       )}
 
       {/* Result Panel */}

@@ -12,6 +12,7 @@ import AdminProblemListPage from "./pages/admin-problem-list";
 import EditProblem from "./pages/edit-problem";
 import AdminDashboard from "./components/admin/admin-dashboard";
 import AdminGuard from "./components/auth/admin-guard";
+import UserProfilePage from "./pages/user-profile-page";
 
 function App() {
   return (
@@ -29,6 +30,15 @@ function App() {
                 path={`/problems/:slug/solution`}
                 element={<SolutionPage />}
               />
+
+
+            {/* User routes */}
+
+            <Route path="/profile" element = {<UserProfilePage/>} >
+            </Route>
+
+
+
 
               {/*Admin Routes */}
 

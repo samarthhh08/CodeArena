@@ -29,10 +29,14 @@ namespace CjsApi.Repositories.SubmissionRepository
                 .FirstOrDefaultAsync(s => s.Id == id);
 
         public Task<List<Submission>> GetByUserAsync(int userId)
-            => _context.Submissions
-                .Where(s => s.UserId == userId)
-                .OrderByDescending(s => s.SubmittedAt)
-                .ToListAsync();
+        => _context.Submissions
+            .Where(s => s.UserId == userId)
+            .Include(s => s.Problem)
+            .OrderByDescending(s => s.SubmittedAt)
+            .GroupBy(s => s.ProblemId)
+            .Select(g => g.First())
+            .Take(5)                // ✅ only latest 5
+            .ToListAsync();
 
         public async Task UpdateStatusAsync(int submissionId, SubmissionStatus status)
         {
