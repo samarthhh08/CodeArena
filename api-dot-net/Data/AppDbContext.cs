@@ -14,6 +14,17 @@ namespace CjsApi.Data
         public DbSet<Submission> Submissions => Set<Submission>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<ProblemTag> ProblemTags => Set<ProblemTag>();
+        public DbSet<McqQuestion> McqQuestions => Set<McqQuestion>();
+        public DbSet<McqAttempt> McqAttempts => Set<McqAttempt>();
+        public DbSet<QuizSession> QuizSessions => Set<QuizSession>();
+
+        public DbSet<Contest> Contests => Set<Contest>();
+
+        public DbSet<ContestProblem> ContestProblems => Set<ContestProblem>();
+
+        public DbSet<ContestParticipant> ContestParticipants => Set<ContestParticipant>();
+
+        public DbSet<ContestSubmission> ContestSubmissions => Set<ContestSubmission>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +69,62 @@ namespace CjsApi.Data
                 .WithMany(p => p.Submissions)
                 .HasForeignKey(s => s.ProblemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // MCQ Question → User (Creator)
+            modelBuilder.Entity<McqQuestion>()
+                .HasOne(m => m.Creator)
+                .WithMany()
+                .HasForeignKey(m => m.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // MCQ Attempt → User
+            modelBuilder.Entity<McqAttempt>()
+                .HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // MCQ Attempt → Question
+            modelBuilder.Entity<McqAttempt>()
+                .HasOne(m => m.Question)
+                .WithMany(q => q.Attempts)
+                .HasForeignKey(m => m.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // MCQ Attempt → Quiz Session
+            modelBuilder.Entity<McqAttempt>()
+                .HasOne(m => m.QuizSession)
+                .WithMany(q => q.Attempts)
+                .HasForeignKey(m => m.QuizSessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quiz Session → User
+            modelBuilder.Entity<QuizSession>()
+                .HasOne(q => q.User)
+                .WithMany()
+                .HasForeignKey(q => q.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Composite PK
+            modelBuilder.Entity<ContestProblem>()
+                .HasKey(cp => new { cp.ContestId, cp.ProblemId });
+
+            // ContestProblem → ContestSubmission
+            modelBuilder.Entity<ContestSubmission>()
+                .HasOne(cs => cs.ContestProblem)
+                .WithMany(cp => cp.Submissions)
+                .HasForeignKey(cs => new { cs.ContestId, cs.ProblemId });
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ContestParticipant>()
+                .HasKey(cp => new { cp.ContestId, cp.UserId });
+
+            modelBuilder.Entity<ContestSubmission>()
+                .HasIndex(cs => new { cs.ContestId, cs.UserId });
+
+
         }
     }
 }

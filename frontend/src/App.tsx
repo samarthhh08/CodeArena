@@ -13,6 +13,9 @@ import EditProblem from "./pages/edit-problem";
 import AdminDashboard from "./components/admin/admin-dashboard";
 import AdminGuard from "./components/auth/admin-guard";
 import UserProfilePage from "./pages/user-profile-page";
+import AdminMcqPage from "./pages/admin-mcq-page";
+import UserGuard from "./components/auth/user-guard";
+import McqPage from "./pages/mcq-page";
 
 function App() {
   return (
@@ -30,6 +33,15 @@ function App() {
                 path={`/problems/:slug/solution`}
                 element={<SolutionPage />}
               />
+
+              <Route
+                path="/mcq"
+                element={
+                  <UserGuard>
+                    <McqPage />
+                  </UserGuard>
+                }
+              ></Route>
 
               {/* User routes */}
 
@@ -69,6 +81,15 @@ function App() {
                 element={
                   <AdminGuard>
                     <AdminDashboard />
+                  </AdminGuard>
+                }
+              ></Route>
+
+              <Route
+                path="/admin/mcq"
+                element={
+                  <AdminGuard>
+                    <AdminMcqPage />
                   </AdminGuard>
                 }
               ></Route>

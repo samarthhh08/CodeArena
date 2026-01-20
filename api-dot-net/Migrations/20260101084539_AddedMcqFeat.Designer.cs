@@ -4,6 +4,7 @@ using CjsApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace apidotnet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260101084539_AddedMcqFeat")]
+    partial class AddedMcqFeat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,112 +24,6 @@ namespace apidotnet.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("CjsApi.Models.Contest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contests");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestParticipant", b =>
-                {
-                    b.Property<int>("ContestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDisqualified")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("ContestId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ContestParticipants");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestProblem", b =>
-                {
-                    b.Property<int>("ContestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int");
-
-                    b.HasKey("ContestId", "ProblemId");
-
-                    b.HasIndex("ProblemId");
-
-                    b.ToTable("ContestProblems");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestSubmission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ContestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("ContestId", "ProblemId");
-
-                    b.HasIndex("ContestId", "UserId");
-
-                    b.ToTable("ContestSubmissions");
-                });
 
             modelBuilder.Entity("CjsApi.Models.McqAttempt", b =>
                 {
@@ -459,63 +356,6 @@ namespace apidotnet.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CjsApi.Models.ContestParticipant", b =>
-                {
-                    b.HasOne("CjsApi.Models.Contest", "Contest")
-                        .WithMany("Participants")
-                        .HasForeignKey("ContestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CjsApi.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contest");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestProblem", b =>
-                {
-                    b.HasOne("CjsApi.Models.Contest", "Contest")
-                        .WithMany("ContestProblems")
-                        .HasForeignKey("ContestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CjsApi.Models.Problem", "Problem")
-                        .WithMany()
-                        .HasForeignKey("ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contest");
-
-                    b.Navigation("Problem");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestSubmission", b =>
-                {
-                    b.HasOne("CjsApi.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CjsApi.Models.ContestProblem", "ContestProblem")
-                        .WithMany("Submissions")
-                        .HasForeignKey("ContestId", "ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ContestProblem");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("CjsApi.Models.McqAttempt", b =>
                 {
                     b.HasOne("CjsApi.Models.McqQuestion", "Question")
@@ -612,18 +452,6 @@ namespace apidotnet.Migrations
                         .IsRequired();
 
                     b.Navigation("Problem");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.Contest", b =>
-                {
-                    b.Navigation("ContestProblems");
-
-                    b.Navigation("Participants");
-                });
-
-            modelBuilder.Entity("CjsApi.Models.ContestProblem", b =>
-                {
-                    b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("CjsApi.Models.McqQuestion", b =>

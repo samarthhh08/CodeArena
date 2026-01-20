@@ -1,12 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  PlusCircle,
-  List,
-  Edit,
-  LayoutDashboard,
-} from "lucide-react";
+import { PlusCircle, List, Edit, LayoutDashboard, HelpCircle } from "lucide-react";
 
 export default function AdminDashboard() {
   return (
@@ -50,6 +45,14 @@ export default function AdminDashboard() {
           action="Edit"
         />
       </div>
+
+      <DashboardCard
+        title="MCQ Questions"
+        description="Manage multiple choice questions for student practice."
+        icon={<HelpCircle className="w-6 h-6 text-purple-600" />}
+        to="/admin/mcq"
+        action="Manage"
+      />
     </div>
   );
 }
@@ -78,9 +81,7 @@ function DashboardCard({
           {icon}
           <h2 className="font-semibold text-lg">{title}</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {description}
-        </p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
       <Link to={to} className="mt-4">

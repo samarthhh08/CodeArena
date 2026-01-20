@@ -18,6 +18,8 @@ using CjsApi.Services.UserService;
 using CjsApi.Repositories.SubmissionRepository;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.RateLimiting;
+using CjsApi.Services.McqService;
+using CjsApi.Repositories.McqRepository;
 
 
 DotNetEnv.Env.Load();
@@ -112,6 +114,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProblemService, ProblemService>();
 builder.Services.AddScoped<IProblemRepository, ProblemRepository>();
+
+builder.Services.AddScoped<IMcqService, McqService>();
+builder.Services.AddScoped<IMcqRepository, McqRepository>();
 
 builder.Services.AddSingleton<CodeExecutorBase, JavaCodeExecutor>();
 builder.Services.AddSingleton<CodeExecutorBase, NodeCodeExecutor>();

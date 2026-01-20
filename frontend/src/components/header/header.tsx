@@ -18,10 +18,15 @@ const Links = [
     title: "Problems",
     link: "/problems",
   },
+  // {
+  //   id: 3,
+  //   title: "DSA Practice",
+  //   link: "/dsa-practice",
+  // },
   {
     id: 3,
-    title: "DSA Practice",
-    link: "/dsa-practice",
+    title: "MCQ",
+    link: "/mcq",
   },
 ];
 
@@ -88,7 +93,7 @@ const Header = () => {
           {/* ADMIN DASHBOARD */}
           {user?.role === "ADMIN" && (
             <Link
-              to="/admin"
+              to="/admin/dashboard"
               className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
             >
               <MdDashboard className="w-5 h-5" />
