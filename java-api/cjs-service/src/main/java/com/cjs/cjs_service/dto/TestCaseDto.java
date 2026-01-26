@@ -18,5 +18,10 @@ public class TestCaseDto {
 
     private boolean isSample = false;
 
+    // public TestCaseDto(String input, String output) {
+    //     this.input = input;
+    //     this.output = output;
+    // }
+
     // getters and setters
 }

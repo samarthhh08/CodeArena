@@ -37,6 +37,10 @@ public class ProblemService {
         return problemRepository.findBySlug(slug).orElse(null);
     }
 
+      public Problem getProblemById(Integer id) {
+        return problemRepository.findById(id).orElse(null);
+    }
+
     
     public int createProblem(CreateProblemDto dto) {
         Problem problem = new Problem();

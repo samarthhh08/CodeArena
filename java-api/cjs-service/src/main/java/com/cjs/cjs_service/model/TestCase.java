@@ -26,5 +26,7 @@ public class TestCase {
 
     private boolean isSample = false;
 
+   
+
     // getters and setters
 }
