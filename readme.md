@@ -2,7 +2,7 @@
 
 ```sh
 # clone the repo
-git clone https://github.com/roshankosare/cjs.git
+git clone https://github.com/samarthhh08/CodeArena.git
 
 ```
 
@@ -74,3 +74,4 @@ git commit -m "Fix issue #<issue-id>: short description of change"
 #### example:
  PR Title: Fix #12: Add pagination to problems page
  PR Description: Fixes #12
+
