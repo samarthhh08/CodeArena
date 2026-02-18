@@ -20,25 +20,21 @@ public class SecurityConfig {
         public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
                 return http
-                                // 🔥 HARD DISABLE BASIC AUTH
+                               
                                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
 
-                                // 🔥 HARD DISABLE FORM LOGIN
                                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 
-                                // 🔥 HARD DISABLE LOGOUT
                                 .logout(ServerHttpSecurity.LogoutSpec::disable)
 
-                                // 🔥 DISABLE CSRF
                                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-
-                                // 🔥 IMPORTANT: stop browser popup
+                         
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((exchange, e) -> Mono
                                                                 .fromRunnable(() -> exchange.getResponse()
                                                                                 .setStatusCode(HttpStatus.UNAUTHORIZED))))
 
-                                // 🔥 Stateless JWT from cookie
+                               
                                 .securityContextRepository(new JwtCookieSecurityContextRepository())
 
                                 .authorizeExchange(ex -> ex
